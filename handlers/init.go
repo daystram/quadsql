@@ -18,7 +18,7 @@ type Handler struct {
 	database     *db.DB
 	config       *QueryConfig
 	index        *data.QuadNode
-	lastExecTime int64
+	lastExecTime float64
 }
 
 func InitHandlers(database *db.DB, config *QueryConfig) Handler {
@@ -60,13 +60,13 @@ func (h *Handler) HandleCommand(command string) (err error) {
 		fmt.Printf("Index Ready     : %s\n", map[bool]string{true: "Yes", false: "No"}[h.config.IndexReady])
 		fmt.Printf("Index Nodes     : %d nodes\n", count)
 		fmt.Printf("Index Max Depth : %d\n", depth)
-		fmt.Printf("Last Exec Time  : %d ms\n", h.lastExecTime/1000)
+		fmt.Printf("Last Exec Time  : %.3f µs (%.3f ms)\n", h.lastExecTime/1e3, h.lastExecTime/1e6)
 	case "":
 		break
 	default:
 		err = h.performQuery(command)
 		if h.config.ShowTime {
-			fmt.Printf("Exec time: %d ms\n", h.lastExecTime/1000)
+			fmt.Printf("Exec time: %.3f µs (%.3f ms)\n", h.lastExecTime/1e3, h.lastExecTime/1e6)
 		}
 		if err == ErrInvalidQuery {
 			err = nil
