@@ -18,7 +18,7 @@ func interactive(cmd *cobra.Command, args []string) {
 			Prompt:  "{{ . }} ",
 			Valid:   "{{ . | green }} ",
 			Invalid: "{{ . | red }} ",
-			Success: "{{ . | gray }} ",
+			Success: "{{ . | bold }} ",
 		},
 	}
 
