@@ -6,16 +6,17 @@ import (
 )
 
 type Point struct {
-	Coordinate []float32
+	Position []float32
 }
 
 func ParsePoint(str string) (point Point, err error) {
-	str = "[" + strings.TrimSuffix(strings.TrimPrefix(strings.ToLower(str), "point("), ")") + "]"
-	err = json.Unmarshal([]byte(str), &point.Coordinate)
+	str = strings.TrimPrefix(strings.ToLower(str), "point")
+	str = "[" + strings.TrimSuffix(strings.TrimPrefix(str, "("), ")") + "]"
+	err = json.Unmarshal([]byte(str), &point.Position)
 	return
 }
 
 func (p Point) String() string {
-	byteStr, _ := json.Marshal(&p.Coordinate)
+	byteStr, _ := json.Marshal(&p.Position)
 	return "Point(" + strings.TrimSuffix(strings.TrimPrefix(string(byteStr), "["), "]") + ")"
 }
