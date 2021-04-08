@@ -12,7 +12,7 @@ import (
 
 type DB struct {
 	Dimension int
-	RowCount  int
+	Table     []data.Point // in-memory table
 	file      *os.File
 }
 
@@ -20,7 +20,7 @@ func OpenDB(source string) (db DB, err error) {
 	if db.file, err = os.Open(source); err != nil {
 		return
 	}
-	// validate source
+	// parse source
 	scanner := bufio.NewScanner(db.file)
 	scanner.Scan()
 	dimensionInfo := scanner.Text()
@@ -28,6 +28,7 @@ func OpenDB(source string) (db DB, err error) {
 		fmt.Printf("invalid dimension definition: \"%s\"\n", dimensionInfo)
 		return DB{}, ErrBadDBSource
 	}
+	db.Table = make([]data.Point, 0)
 	for scanner.Scan() {
 		line := scanner.Text()
 		var point data.Point
@@ -35,11 +36,11 @@ func OpenDB(source string) (db DB, err error) {
 			fmt.Printf("invalid statement: \"%s\"\n", line)
 			return DB{}, ErrBadDBSource
 		}
-		if len(point.Coordinate) != db.Dimension {
+		if len(point.Position) != db.Dimension {
 			fmt.Printf("point %s does not match DB dimension of %d\n", point, db.Dimension)
 			return DB{}, ErrBadDBSource
 		}
-		db.RowCount++
+		db.Table = append(db.Table, point)
 	}
 	return
 }
