@@ -4,9 +4,11 @@ import (
 	"fmt"
 
 	"github.com/manifoldco/promptui"
+
+	"github.com/daystram/quadsql/db"
 )
 
-func HandleQuery(query string) (err error) {
+func HandleQuery(db *db.DB, query string) (err error) {
 	switch query {
 	case "/exit":
 		err = promptui.ErrInterrupt
