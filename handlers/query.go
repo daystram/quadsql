@@ -18,7 +18,7 @@ import (
 
 type QueryModel struct {
 	Type      string // SELECT, DELETE, INSERT
-	Condition Condition
+	Condition *Condition
 }
 
 type Condition struct {
@@ -26,12 +26,11 @@ type Condition struct {
 	Value interface{}
 }
 
-type QueryResult struct {
-	Count  int
-	Result []struct {
-		ID    int
-		Point data.Point
-	}
+type QueryResult []Row
+
+type Row struct {
+	ID       int
+	Position data.Point
 }
 
 func (h *Handler) performQuery(query string) (err error) {
@@ -40,10 +39,10 @@ func (h *Handler) performQuery(query string) (err error) {
 
 	queryModel := QueryModel{
 		Type: "SELECT",
-		Condition: Condition{
+		Condition: &Condition{
 			Field: "position",
 			Value: data.Point{
-				Position: []float32{1, 2},
+				Position: []float64{2, 3},
 			},
 		},
 	}
@@ -53,12 +52,12 @@ func (h *Handler) performQuery(query string) (err error) {
 		return
 	}
 
-	fmt.Println("  id     position")
+	fmt.Println("  id\t position")
 	fmt.Println("----------------------------")
-	for _, row := range result.Result {
-		fmt.Printf("  %d     %s\n", row.ID, row.Point)
+	for _, row := range result {
+		fmt.Printf("  %d\t %s\n", row.ID, row.Position)
 	}
-	fmt.Printf("\n%d rows\n", result.Count)
+	fmt.Printf("\n%d rows\n", len(result))
 
 	h.lastExecTime = time.Since(start).Nanoseconds()
 	return
@@ -67,7 +66,31 @@ func (h *Handler) performQuery(query string) (err error) {
 func (h *Handler) execute(query QueryModel) (result QueryResult, err error) {
 	switch query.Type {
 	case "SELECT":
-		break
+		if query.Condition == nil {
+			for id, point := range h.database.Table {
+				result = append(result, Row{id, point})
+			}
+		} else {
+			switch query.Condition.Field {
+			case "id":
+				id := query.Condition.Value.(int)
+				if point, ok := h.database.Table[id]; ok {
+					result = append(result, Row{id, point})
+				}
+			case "position":
+				position := query.Condition.Value.(data.Point)
+				if h.config.UseIndex {
+					break
+				} else {
+					for id, point := range h.database.Table {
+						if point.Equals(position) {
+							result = append(result, Row{id, point})
+							break
+						}
+					}
+				}
+			}
+		}
 	case "DELETE":
 		break
 	case "INSERT":
