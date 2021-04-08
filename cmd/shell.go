@@ -2,21 +2,28 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/daystram/quadsql/handlers"
 	"github.com/manifoldco/promptui"
+
+	"github.com/daystram/quadsql/db"
+	"github.com/daystram/quadsql/handlers"
 )
 
-func interactive(source string) {
+var database db.DB
+
+func interactive(source string) (err error) {
+	if database, err = db.OpenDB(source); err != nil {
+		return
+	}
+	defer database.Close()
 	fmt.Printf("Source DB: %s\n", source)
-	// TODO: mount DB file
+
 	fmt.Printf("Building index... ")
 	// TODO: build index
 	fmt.Println("Done!")
+
 	fmt.Println("Use /exit or Ctrl+C to exit")
 
-	var err error
 	var result string
 	prompt := promptui.Prompt{
 		Label: ">",
@@ -32,14 +39,8 @@ func interactive(source string) {
 		if result, err = prompt.Run(); err != nil {
 			break
 		}
-		err = handlers.HandleQuery(result)
+		err = handlers.HandleQuery(&database, result)
 	}
 
-	switch err {
-	case nil, promptui.ErrInterrupt:
-		os.Exit(0)
-	default:
-		fmt.Printf("an error has occurred. %v\n", err)
-		os.Exit(1)
-	}
+	return
 }
