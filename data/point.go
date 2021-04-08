@@ -9,9 +9,9 @@ type Point struct {
 	Coordinate []float32
 }
 
-func ParsePoint(strPoint string) (point Point, err error) {
-	strPoint = "[" + strings.TrimSuffix(strings.TrimPrefix(strings.ToLower(strPoint), "point("), ")") + "]"
-	err = json.Unmarshal([]byte(strPoint), &point.Coordinate)
+func ParsePoint(str string) (point Point, err error) {
+	str = "[" + strings.TrimSuffix(strings.TrimPrefix(strings.ToLower(str), "point("), ")") + "]"
+	err = json.Unmarshal([]byte(str), &point.Coordinate)
 	return
 }
 
