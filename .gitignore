@@ -2,6 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=go,vscode,intellij+all,macos,windows,linux,vim
 
 quadsql
+data.db
 
 ### Go ###
 # Binaries for programs and plugins
