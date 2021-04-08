@@ -11,23 +11,23 @@ func (h *Handler) BuildIndex() (err error) {
 	// TODO: build index
 	h.index = &data.QuadNode{
 		Centre: data.Point{
-			Position: []float32{1, 2},
+			Position: []float64{1, 2},
 		},
 		Children: []*data.QuadNode{{
 			Centre: data.Point{
-				Position: []float32{1, 2},
+				Position: []float64{1, 2},
 			},
 		}, {
 			Centre: data.Point{
-				Position: []float32{1, 2},
+				Position: []float64{1, 2},
 			},
 		}, {
 			Centre: data.Point{
-				Position: []float32{1, 2},
+				Position: []float64{1, 2},
 			},
 		}, {
 			Centre: data.Point{
-				Position: []float32{1, 2},
+				Position: []float64{1, 2},
 			},
 		}},
 	}
