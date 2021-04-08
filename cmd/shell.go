@@ -43,7 +43,7 @@ func interactive(source string, buildIndex bool) (err error) {
 		if result, err = prompt.Run(); err != nil {
 			break
 		}
-		err = h.HandleQuery(result)
+		err = h.HandleCommand(result)
 	}
 
 	return
