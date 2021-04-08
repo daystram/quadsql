@@ -4,9 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/daystram/quadsql/data"
 )
 
 type DB struct {
@@ -27,11 +28,15 @@ func OpenDB(source string) (db DB, err error) {
 		fmt.Printf("invalid dimension definition: \"%s\"\n", dimensionInfo)
 		return DB{}, ErrBadDBSource
 	}
-	r, _ := regexp.Compile("^point( ([0-9]+[.])?[0-9]+){2,}$")
 	for scanner.Scan() {
 		line := scanner.Text()
-		if !r.MatchString(line) {
+		var point data.Point
+		if point, err = data.ParsePoint(line); err != nil {
 			fmt.Printf("invalid statement: \"%s\"\n", line)
+			return DB{}, ErrBadDBSource
+		}
+		if len(point.Coordinate) != db.Dimension {
+			fmt.Printf("point %s does not match DB dimension of %d\n", point, db.Dimension)
 			return DB{}, ErrBadDBSource
 		}
 	}

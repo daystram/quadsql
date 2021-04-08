@@ -1,4 +1,4 @@
 dim 2
-point 1 1
-point 2 3
-point 5 0
+Point(1, 1)
+Point(2, 3)
+Point(5.1231412, 0)
