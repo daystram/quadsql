@@ -39,6 +39,7 @@ func OpenDB(source string) (db DB, err error) {
 			fmt.Printf("point %s does not match DB dimension of %d\n", point, db.Dimension)
 			return DB{}, ErrBadDBSource
 		}
+		db.RowCount++
 	}
 	return
 }
