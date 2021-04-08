@@ -6,10 +6,16 @@ import (
 
 	"github.com/daystram/quadsql/handlers"
 	"github.com/manifoldco/promptui"
-	"github.com/spf13/cobra"
 )
 
-func interactive(cmd *cobra.Command, args []string) {
+func interactive(source string) {
+	fmt.Printf("Source DB: %s\n", source)
+	// TODO: mount DB file
+	fmt.Printf("Building index... ")
+	// TODO: build index
+	fmt.Println("Done!")
+	fmt.Println("Use /exit or Ctrl+C to exit")
+
 	var err error
 	var result string
 	prompt := promptui.Prompt{
