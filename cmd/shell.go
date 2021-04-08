@@ -9,18 +9,22 @@ import (
 	"github.com/daystram/quadsql/handlers"
 )
 
-var database db.DB
-
-func interactive(source string) (err error) {
+func interactive(source string, buildIndex bool) (err error) {
+	var database db.DB
 	if database, err = db.OpenDB(source); err != nil {
 		return
 	}
 	defer database.Close()
 	fmt.Printf("Source DB: %s\n", source)
+	h := handlers.InitHandlers(&database, &handlers.QueryConfig{
+		UseIndex: buildIndex,
+	})
 
-	fmt.Printf("Building index... ")
-	// TODO: build index
-	fmt.Println("Done!")
+	if buildIndex {
+		if err = h.BuildIndex(); err != nil {
+			return
+		}
+	}
 
 	fmt.Println("Use /exit or Ctrl+C to exit")
 
@@ -39,7 +43,7 @@ func interactive(source string) (err error) {
 		if result, err = prompt.Run(); err != nil {
 			break
 		}
-		err = handlers.HandleQuery(&database, result)
+		err = h.HandleQuery(result)
 	}
 
 	return
