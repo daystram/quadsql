@@ -18,7 +18,7 @@ import (
 
 type QueryModel struct {
 	Type      string // SELECT, DELETE, INSERT
-	Condition *Condition
+	Condition Condition
 }
 
 type Condition struct {
@@ -34,39 +34,40 @@ type Row struct {
 }
 
 func (h *Handler) performQuery(query string) (err error) {
-	start := time.Now()
-	fmt.Printf("QUERY: %s \n", query)
 
+	// TODO: query parser
 	queryModel := QueryModel{
 		Type: "SELECT",
-		Condition: &Condition{
+		Condition: Condition{
 			Field: "position",
 			Value: data.Point{
 				Position: []float64{2, 3},
 			},
 		},
 	}
+	fmt.Printf("QUERY: %+v \n", queryModel)
 
+	start := time.Now()
 	var result QueryResult
 	if result, err = h.execute(queryModel); err != nil {
 		return
 	}
+	h.lastExecTime = float64(time.Since(start).Nanoseconds())
 
-	fmt.Println("  id\t position")
+	fmt.Println("\n  id\t position")
 	fmt.Println("----------------------------")
 	for _, row := range result {
 		fmt.Printf("  %d\t %s\n", row.ID, row.Position)
 	}
-	fmt.Printf("\n%d rows\n", len(result))
+	fmt.Printf("\nMatched %d row%s\n", len(result), map[bool]string{true: "", false: "s"}[len(result) == 1])
 
-	h.lastExecTime = time.Since(start).Nanoseconds()
 	return
 }
 
 func (h *Handler) execute(query QueryModel) (result QueryResult, err error) {
 	switch query.Type {
 	case "SELECT":
-		if query.Condition == nil {
+		if query.Condition.Field == "" {
 			for id, point := range h.database.Table {
 				result = append(result, Row{id, point})
 			}
