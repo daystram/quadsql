@@ -12,7 +12,7 @@ import (
 
 type DB struct {
 	Dimension int
-	Table     []data.Point // in-memory table
+	Table     map[int]data.Point // in-memory table
 	file      *os.File
 }
 
@@ -28,7 +28,9 @@ func OpenDB(source string) (db DB, err error) {
 		fmt.Printf("invalid dimension definition: \"%s\"\n", dimensionInfo)
 		return DB{}, ErrBadDBSource
 	}
-	db.Table = make([]data.Point, 0)
+	// populate table
+	lastID := 0
+	db.Table = make(map[int]data.Point)
 	for scanner.Scan() {
 		line := scanner.Text()
 		var point data.Point
@@ -40,7 +42,8 @@ func OpenDB(source string) (db DB, err error) {
 			fmt.Printf("point %s does not match DB dimension of %d\n", point, db.Dimension)
 			return DB{}, ErrBadDBSource
 		}
-		db.Table = append(db.Table, point)
+		db.Table[lastID] = point
+		lastID++
 	}
 	return
 }
