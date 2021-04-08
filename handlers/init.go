@@ -55,7 +55,7 @@ func (h *Handler) HandleCommand(command string) (err error) {
 	case "/info":
 		count, depth := countNodes(h.index)
 		fmt.Printf("Dimension       : %d\n", h.database.Dimension)
-		fmt.Printf("DB Row Count    : %d\n", h.database.RowCount)
+		fmt.Printf("DB Row Count    : %d\n", len(h.database.Table))
 		fmt.Printf("Index Enabled   : %s\n", map[bool]string{true: "Yes", false: "No"}[h.config.UseIndex])
 		fmt.Printf("Index Ready     : %s\n", map[bool]string{true: "Yes", false: "No"}[h.config.IndexReady])
 		fmt.Printf("Index Nodes     : %d nodes\n", count)
