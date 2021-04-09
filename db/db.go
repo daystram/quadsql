@@ -10,6 +10,8 @@ import (
 	"github.com/daystram/quadsql/data"
 )
 
+const MAX_RANGE = 1024
+
 type DB struct {
 	Dimension int
 	Table     map[int]data.Point // in-memory table
@@ -17,16 +19,18 @@ type DB struct {
 }
 
 func OpenDB(source string) (db DB, err error) {
-	if db.file, err = os.Open(source); err != nil {
+	if db.file, err = os.OpenFile(source, os.O_RDWR|os.O_CREATE, 0666); err != nil {
 		return
 	}
 	// parse source
 	scanner := bufio.NewScanner(db.file)
 	scanner.Scan()
 	dimensionInfo := scanner.Text()
-	if db.Dimension, err = strconv.Atoi(strings.Split(dimensionInfo, " ")[1]); err != nil {
-		fmt.Printf("invalid dimension definition: \"%s\"\n", dimensionInfo)
-		return DB{}, ErrBadDBSource
+	if dimensionInfo != "" {
+		if db.Dimension, err = strconv.Atoi(strings.Split(dimensionInfo, " ")[1]); err != nil {
+			fmt.Printf("invalid dimension definition: \"%s\"\n", dimensionInfo)
+			return DB{}, ErrBadDBSource
+		}
 	}
 	// populate table
 	lastID := 0
@@ -49,5 +53,16 @@ func OpenDB(source string) (db DB, err error) {
 }
 
 func (db *DB) Close() error {
+	db.file.Seek(0, 0)
+	writer := bufio.NewWriter(db.file)
+	fmt.Fprintf(writer, "dim %d\n", db.Dimension)
+	points := make([]data.Point, len(db.Table))
+	for id, point := range db.Table {
+		points[id] = point
+	}
+	for _, point := range points {
+		fmt.Fprintf(writer, "%s\n", point)
+	}
+	writer.Flush()
 	return db.file.Close()
 }
