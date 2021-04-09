@@ -9,7 +9,7 @@ import (
 	"github.com/daystram/quadsql/handlers"
 )
 
-func interactive(source string, buildIndex bool) (err error) {
+func shell(source string, buildIndex bool) (err error) {
 	var database db.DB
 	if database, err = db.OpenDB(source); err != nil {
 		return
