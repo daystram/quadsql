@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"fmt"
 	"math/rand"
 	"sort"
+	"time"
 
 	"github.com/daystram/quadsql/data"
 	"github.com/daystram/quadsql/db"
@@ -13,8 +15,8 @@ func Generate(source string, genSeed int64, dimension, size int, max float64, so
 	if database, err = db.OpenDB(source); err != nil {
 		return
 	}
-	defer database.Close()
 
+	start := time.Now()
 	database.Dimension = dimension
 	randomizer := rand.New(rand.NewSource(genSeed))
 	points := make([]data.Point, 0)
@@ -30,9 +32,13 @@ func Generate(source string, genSeed int64, dimension, size int, max float64, so
 			return points[i].CompareTo(points[j]) > 0
 		})
 	}
+	database.Table = make(map[int]data.Point)
 	for id, point := range points {
 		database.Table[id] = point
 	}
+	execTime := float64(time.Since(start).Nanoseconds())
 
+	err = database.Close()
+	fmt.Printf("Exec time: %.3f ms\n", execTime/1e6)
 	return
 }

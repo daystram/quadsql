@@ -53,6 +53,7 @@ func OpenDB(source string) (db DB, err error) {
 }
 
 func (db *DB) Close() error {
+	db.file.Truncate(0)
 	db.file.Seek(0, 0)
 	writer := bufio.NewWriter(db.file)
 	fmt.Fprintf(writer, "dim %d\n", db.Dimension)
