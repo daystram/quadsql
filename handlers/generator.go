@@ -27,7 +27,7 @@ func Generate(source string, genSeed int64, dimension, size int, max float64, so
 	}
 	if sorted {
 		sort.Slice(points, func(i, j int) bool {
-			return points[i].Sum() < points[j].Sum()
+			return points[i].CompareTo(points[j]) > 0
 		})
 	}
 	for id, point := range points {

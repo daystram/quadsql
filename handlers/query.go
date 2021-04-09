@@ -36,12 +36,16 @@ type Row struct {
 func (h *Handler) performQuery(query string) (err error) {
 
 	// TODO: query parser
+	// queryModel := QueryModel{
+	// 	Type:      "SELECT",
+	// 	Condition: Condition{},
+	// }
 	queryModel := QueryModel{
 		Type: "SELECT",
 		Condition: Condition{
 			Field: "position",
 			Value: data.Point{
-				Position: []float64{2, 3},
+				Position: []float64{278.99222549719235, 159.8223863234124},
 			},
 		},
 	}
@@ -84,7 +88,7 @@ func (h *Handler) execute(query QueryModel) (result QueryResult, err error) {
 					break
 				} else {
 					for id, point := range h.database.Table {
-						if point.Equals(position) {
+						if point.CompareTo(position) == 0 {
 							result = append(result, Row{id, point})
 							break
 						}

@@ -24,14 +24,22 @@ func (p Point) String() string {
 	return "Point(" + strings.TrimSuffix(strings.TrimPrefix(string(byteStr), "["), "]") + ")"
 }
 
-func (p Point) Equals(other Point) bool {
-	if len(p.Position) != len(other.Position) {
-		return false
+func (p Point) CompareTo(other Point) (diff float64) {
+	if len(p.Position) > len(other.Position) {
+		return -1
 	}
-	for i, coord := range p.Position {
-		if math.Abs(coord-other.Position[i]) > epsilon {
-			return false
-		}
+	if len(p.Position) < len(other.Position) {
+		return 1
 	}
-	return true
+	inMargin := true
+	var delta float64
+	for dim := 0; dim < len(p.Position); dim++ {
+		delta += other.Position[dim] - p.Position[dim]
+		inMargin = inMargin && math.Abs(delta) < epsilon
+	}
+	if inMargin {
+		return 0
+	} else {
+		return delta
+	}
 }
