@@ -9,9 +9,10 @@ import (
 )
 
 type QueryConfig struct {
-	ShowTime   bool
-	UseIndex   bool
-	IndexReady bool
+	ShowTime    bool
+	UseIndex    bool
+	IndexReady  bool
+	IsPointQuad bool // true: Point; false: Region
 }
 
 type Handler struct {

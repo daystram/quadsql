@@ -9,15 +9,16 @@ import (
 	"github.com/daystram/quadsql/handlers"
 )
 
-func shell(source string, buildIndex bool) (err error) {
+func shell(source string, buildIndex, isPointQuad bool) (err error) {
 	var database db.DB
+	fmt.Printf("Source DB: %s\n", source)
 	if database, err = db.OpenDB(source); err != nil {
 		return
 	}
 	defer database.Close()
-	fmt.Printf("Source DB: %s\n", source)
 	h := handlers.InitHandlers(&database, &handlers.QueryConfig{
-		UseIndex: buildIndex,
+		UseIndex:    buildIndex,
+		IsPointQuad: isPointQuad,
 	})
 
 	if buildIndex {

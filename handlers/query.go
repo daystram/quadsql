@@ -37,19 +37,19 @@ func (h *Handler) performQuery(query string) (err error) {
 
 	// TODO: query parser
 
-	// queryModel := QueryModel{
-	// 	Type:      "SELECT",
-	// 	Condition: Condition{},
-	// }
 	queryModel := QueryModel{
-		Type: "SELECT",
-		Condition: Condition{
-			Field: "position",
-			Value: data.Point{
-				Position: []float64{278.99222549719235, 159.8223863234124},
-			},
-		},
+		Type:      "SELECT",
+		Condition: Condition{},
 	}
+	// queryModel := QueryModel{
+	// 	Type: "SELECT",
+	// 	Condition: Condition{
+	// 		Field: "position",
+	// 		Value: data.Point{
+	// 			Position: []float64{278.99222549719235, 159.8223863234124},
+	// 		},
+	// 	},
+	// }
 	fmt.Printf("QUERY: %+v \n", queryModel)
 
 	start := time.Now()
@@ -81,8 +81,8 @@ func (h *Handler) execute(query QueryModel) (result QueryResult, err error) {
 			case "id":
 				// linear scan on table
 				id := query.Condition.Value.(int)
-				if point, ok := h.database.Table[id]; ok {
-					result = append(result, Row{id, point})
+				if id < len(h.database.Table) {
+					result = append(result, Row{id, h.database.Table[id]})
 				}
 			case "position":
 				position := query.Condition.Value.(data.Point)

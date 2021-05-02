@@ -19,22 +19,18 @@ func Generate(source string, genSeed int64, dimension, size int, max float64, so
 	start := time.Now()
 	database.Dimension = dimension
 	randomizer := rand.New(rand.NewSource(genSeed))
-	points := make([]data.Point, 0)
+	database.Table = make([]data.Point, 0)
 	for id := 0; id < size; id++ {
 		position := make([]float64, 0)
 		for c := 0; c < dimension; c++ {
 			position = append(position, randomizer.Float64()*max)
 		}
-		points = append(points, data.Point{Position: position})
+		database.Table = append(database.Table, data.Point{Position: position})
 	}
 	if sorted {
-		sort.Slice(points, func(i, j int) bool {
-			return points[i].CompareTo(points[j]) > 0
+		sort.Slice(database.Table, func(i, j int) bool {
+			return database.Table[i].CompareTo(database.Table[j]) > 0
 		})
-	}
-	database.Table = make(map[int]data.Point)
-	for id, point := range points {
-		database.Table[id] = point
 	}
 	execTime := float64(time.Since(start).Nanoseconds())
 
