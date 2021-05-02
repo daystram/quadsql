@@ -2,12 +2,15 @@ package handlers
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/daystram/quadsql/data"
 )
 
 func (h *Handler) BuildIndex() (err error) {
 	fmt.Printf("Building index... ")
+	start := time.Now()
+
 	// TODO: build index
 	h.index = &data.QuadNode{
 		Centre: data.Point{
@@ -32,7 +35,8 @@ func (h *Handler) BuildIndex() (err error) {
 		}},
 	}
 	h.config.IndexReady = true
-	fmt.Println("Done")
+	lastExecTime := float64(time.Since(start).Nanoseconds())
+	fmt.Printf("Done in %.3f µs (%.3f ms)\n", lastExecTime/1e3, lastExecTime/1e6)
 	return
 }
 

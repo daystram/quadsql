@@ -11,9 +11,9 @@ import (
 	Example queries:
 		SELECT *
 		SELECT * WHERE position = Point(1,2)
-		DELETE WHERE id = 4
-		DELETE WHERE position = Point(1,2)
-		INSERT Point(5,6)
+		// DELETE WHERE id = 4
+		// DELETE WHERE position = Point(1,2)
+		// INSERT Point(5,6)
 */
 
 type QueryModel struct {
@@ -36,6 +36,7 @@ type Row struct {
 func (h *Handler) performQuery(query string) (err error) {
 
 	// TODO: query parser
+
 	// queryModel := QueryModel{
 	// 	Type:      "SELECT",
 	// 	Condition: Condition{},
@@ -78,6 +79,7 @@ func (h *Handler) execute(query QueryModel) (result QueryResult, err error) {
 		} else {
 			switch query.Condition.Field {
 			case "id":
+				// linear scan on table
 				id := query.Condition.Value.(int)
 				if point, ok := h.database.Table[id]; ok {
 					result = append(result, Row{id, point})
@@ -85,8 +87,10 @@ func (h *Handler) execute(query QueryModel) (result QueryResult, err error) {
 			case "position":
 				position := query.Condition.Value.(data.Point)
 				if h.config.UseIndex {
+					// TODO: point query using index on table
 					break
 				} else {
+					// linear scan on table
 					for id, point := range h.database.Table {
 						if point.CompareTo(position) == 0 {
 							result = append(result, Row{id, point})
