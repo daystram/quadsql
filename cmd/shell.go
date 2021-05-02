@@ -17,16 +17,16 @@ func shell(source string, buildIndex, isPointQuad bool) (err error) {
 	}
 	defer database.Close()
 	h := handlers.InitHandlers(&database, &handlers.QueryConfig{
-		UseIndex:    buildIndex,
-		IsPointQuad: isPointQuad,
+		UseIndex: buildIndex,
 	})
 
 	if buildIndex {
-		if err = h.BuildIndex(); err != nil {
+		if err = h.BuildIndex(isPointQuad); err != nil {
 			return
 		}
 	}
 
+	fmt.Println("Use /help to show help page")
 	fmt.Println("Use /exit or Ctrl+C to exit")
 
 	var result string

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/daystram/quadsql/data"
 	"github.com/daystram/quadsql/db"
@@ -38,13 +39,13 @@ func (h *Handler) HandleCommand(command string) (err error) {
 			h.config.UseIndex = true
 			fmt.Println("Index enabled")
 		} else {
-			fmt.Println("Index has not been initialized, use '/index rebuild'")
+			fmt.Println("Index has not been initialized, use '/index rebuild [point|region]'")
 		}
 	case "/index off":
 		h.config.UseIndex = false
 		fmt.Println("Index disabled")
-	case "/index rebuild":
-		err = h.BuildIndex()
+	case "/index rebuild point", "/index rebuild region":
+		err = h.BuildIndex(strings.Split(command, " ")[2] == "point")
 	case "/time":
 		if h.config.ShowTime {
 			h.config.ShowTime = false
@@ -55,13 +56,24 @@ func (h *Handler) HandleCommand(command string) (err error) {
 		}
 	case "/info":
 		count, depth := countNodes(h.index)
-		fmt.Printf("Dimension       : %d\n", h.database.Dimension)
+		fmt.Printf("Dimension       : %dD\n", h.database.Dimension)
 		fmt.Printf("DB Row Count    : %d\n", len(h.database.Table))
-		fmt.Printf("Index Enabled   : %s\n", map[bool]string{true: "Yes", false: "No"}[h.config.UseIndex])
-		fmt.Printf("Index Ready     : %s\n", map[bool]string{true: "Yes", false: "No"}[h.config.IndexReady])
+		if h.config.IndexReady {
+			fmt.Printf("Index Status    : %s\n", map[bool]string{true: "Enabled", false: "Disabled"}[h.config.UseIndex])
+			fmt.Printf("Index Type      : %s Quad-tree\n", map[bool]string{true: "Point", false: "Region"}[h.config.IsPointQuad])
+		} else {
+			fmt.Printf("Index Status    : Uninitialized\n")
+			fmt.Printf("Index Type      : None\n")
+		}
 		fmt.Printf("Index Nodes     : %d nodes\n", count)
 		fmt.Printf("Index Max Depth : %d\n", depth)
 		fmt.Printf("Last Exec Time  : %.3f µs (%.3f ms)\n", h.lastExecTime/1e3, h.lastExecTime/1e6)
+	case "/help", "/?":
+		fmt.Println("/info        : display DB and index statistics")
+		fmt.Println("/index [cmd] : switch index [on], [off], or [rebuild [point|region]]")
+		fmt.Println("/time        : toggle execution time report")
+		fmt.Println("/help        : show this help page")
+		fmt.Println("/exit        : exit quadsql")
 	case "":
 		break
 	default:

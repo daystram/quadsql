@@ -30,9 +30,10 @@ import (
 // 	}},
 // }
 
-func (h *Handler) BuildIndex() (err error) {
+func (h *Handler) BuildIndex(isPoint bool) (err error) {
 	start := time.Now()
 	h.index = nil
+	h.config.IsPointQuad = isPoint
 	if h.config.IsPointQuad {
 		// build Point index
 		fmt.Printf("Building Point index... ")
@@ -70,28 +71,6 @@ func (h *Handler) BuildIndex() (err error) {
 	h.config.IndexReady = true
 	return
 }
-
-/*
-
-2D:
-
- 1 | 0
---- ---
- 2 | 3
-
-
-
-3D:
-
- 1 | 0
---- ---
- 2 | 3
-
- 5 | 4
---- ---
- 6 | 7
-
-*/
 
 func getQuadrant(center, point data.Point) (quad uint) {
 	for i := range center.Position {
