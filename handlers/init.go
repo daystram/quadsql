@@ -31,21 +31,34 @@ func InitHandlers(database *db.DB, config *QueryConfig) Handler {
 }
 
 func (h *Handler) HandleCommand(command string) (err error) {
-	switch command {
+	args := append(strings.Split(command, " "), "$")
+	switch args[0] {
 	case "/exit":
 		err = promptui.ErrInterrupt
-	case "/index on":
-		if h.config.IndexReady {
-			h.config.UseIndex = true
-			fmt.Println("Index enabled")
-		} else {
-			fmt.Println("Index has not been initialized, use '/index rebuild [point|region]'")
+	case "/index":
+		switch args[1] {
+		case "on":
+			if h.config.IndexReady {
+				h.config.UseIndex = true
+				fmt.Println("Index enabled")
+			} else {
+				fmt.Println("Index has not been initialized, use '/index rebuild [point|region]'")
+			}
+		case "off":
+			h.config.UseIndex = false
+			fmt.Println("Index disabled")
+		case "rebuild":
+			switch args[2] {
+			case "point":
+				err = h.BuildIndex(true)
+			case "region":
+				err = h.BuildIndex(false)
+			default:
+				fmt.Println("E: invalid index type, see /help")
+			}
+		default:
+			fmt.Println("E: invalid action, see /help")
 		}
-	case "/index off":
-		h.config.UseIndex = false
-		fmt.Println("Index disabled")
-	case "/index rebuild point", "/index rebuild region":
-		err = h.BuildIndex(strings.Split(command, " ")[2] == "point")
 	case "/time":
 		if h.config.ShowTime {
 			h.config.ShowTime = false
