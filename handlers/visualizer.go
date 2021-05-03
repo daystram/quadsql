@@ -17,7 +17,6 @@ const (
 )
 
 func (h *Handler) DrawSVG(scale float64, filename string) {
-	// TODO: flip origin
 	file, _ := os.Create(fmt.Sprintf("%s.svg", filename))
 	defer file.Close()
 	writer := bufio.NewWriter(file)
