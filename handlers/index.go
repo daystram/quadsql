@@ -37,7 +37,9 @@ func (h *Handler) BuildIndex(isPoint bool) (err error) {
 	if h.config.IsPointQuad {
 		// build Point index
 		fmt.Printf("Building Point index... ")
-		for id, point := range h.database.Table {
+		for i, point := range h.database.Table {
+			id := new(int)
+			*id = i
 			if h.index == nil {
 				h.index = &data.QuadNode{
 					Centre:  point,

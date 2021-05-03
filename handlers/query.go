@@ -87,8 +87,13 @@ func (h *Handler) execute(query QueryModel) (result QueryResult, err error) {
 			case "position":
 				position := query.Condition.Value.(data.Point)
 				if h.config.UseIndex {
-					// TODO: point query using index on table
-					break
+					if h.config.IsPointQuad {
+						// TODO: point query using Point index on table
+						break
+					} else {
+						// TODO: point query using Region index on table
+						break
+					}
 				} else {
 					// linear scan on table
 					for id, point := range h.database.Table {

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/daystram/quadsql/data"
@@ -35,6 +36,21 @@ func (h *Handler) HandleCommand(command string) (err error) {
 	switch args[0] {
 	case "/exit":
 		err = promptui.ErrInterrupt
+	case "/svg":
+		if h.database.Dimension == 2 {
+			var scale float64
+			if scale, err = strconv.ParseFloat(args[1], 64); err != nil || scale <= 0 {
+				fmt.Println("E: invalid scale, see /help")
+				return nil
+			}
+			if len(args)-1 != 3 {
+				fmt.Println("E: invalid output filename, see /help")
+				return
+			}
+			DrawSVG(false, h.index, scale, args[2])
+		} else {
+			fmt.Println("E: only supported for 2D spatial dimensions")
+		}
 	case "/index":
 		switch args[1] {
 		case "on":
@@ -85,6 +101,7 @@ func (h *Handler) HandleCommand(command string) (err error) {
 		fmt.Println("/info        : display DB and index statistics")
 		fmt.Println("/index [cmd] : switch index [on], [off], or [rebuild [point|region]]")
 		fmt.Println("/time        : toggle execution time report")
+		fmt.Println("/svg [s] [f] : draw SVG of the Quad-tree with scale [s] into file [f].svg")
 		fmt.Println("/help        : show this help page")
 		fmt.Println("/exit        : exit quadsql")
 	case "":
