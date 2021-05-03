@@ -40,32 +40,23 @@ func (h *Handler) BuildIndex(isPoint bool) (err error) {
 		for i, point := range h.database.Table {
 			id := new(int)
 			*id = i
-			if h.index == nil {
-				h.index = &data.QuadNode{
-					Centre:  point,
-					PointID: id,
-				}
-			} else {
-				node := h.index
-				for {
-					quad := getQuadrant(node.Centre, point)
-					if child := node.Children[quad]; child != nil {
-						node = child
-					} else {
-						child = &data.QuadNode{
-							Centre:  point,
-							PointID: id,
-						}
-						node.Children[quad] = child
-						break
+			node := &h.index
+			for {
+				if *node != nil {
+					node = &(*node).Children[getQuadrant((*node).Centre, point)]
+				} else {
+					*node = &data.QuadNode{
+						Centre:  point,
+						PointID: id,
 					}
+					break
 				}
 			}
 		}
 	} else {
 		// TODO: build Region index
 		fmt.Printf("Building Region index... ")
-		h.index = &data.QuadNode{}
+
 	}
 
 	lastExecTime := float64(time.Since(start).Nanoseconds())
