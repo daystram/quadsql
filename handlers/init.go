@@ -47,7 +47,7 @@ func (h *Handler) HandleCommand(command string) (err error) {
 				fmt.Println("E: invalid output filename, see /help")
 				return
 			}
-			DrawSVG(false, h.index, scale, args[2])
+			h.DrawSVG(scale, args[2])
 		} else {
 			fmt.Println("E: only supported for 2D spatial dimensions")
 		}
