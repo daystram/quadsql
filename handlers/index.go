@@ -26,9 +26,9 @@ func (h *Handler) BuildIndex(isPoint bool) (err error) {
 				} else {
 					// insert new node
 					*node = &data.QuadNode{
-						Centre:  point,
-						PointID: id,
-						// Children: make([]*data.QuadNode, Exp2(h.database.Dimension)),
+						Centre:   point,
+						PointID:  id,
+						Children: make([]*data.QuadNode, Exp2(h.database.Dimension)),
 					}
 					break
 				}
@@ -41,6 +41,7 @@ func (h *Handler) BuildIndex(isPoint bool) (err error) {
 			Centre: data.Point{
 				Position: []float64{db.MAX_RANGE / 2, db.MAX_RANGE / 2},
 			},
+			Children: make([]*data.QuadNode, Exp2(h.database.Dimension)),
 		}
 		for i, point := range h.database.Table {
 			id := new(int)
@@ -64,8 +65,9 @@ func (h *Handler) BuildIndex(isPoint bool) (err error) {
 				} else {
 					// insert new leaf node
 					*node = &data.QuadNode{
-						Centre:  point,
-						PointID: id,
+						Centre:   point,
+						PointID:  id,
+						Children: make([]*data.QuadNode, Exp2(h.database.Dimension)),
 					}
 					break
 				}
@@ -93,12 +95,13 @@ func createSubDiv(parent data.Point, quad uint, depth int) data.QuadNode {
 		---- ----
 		 -- | +-
 	*/
-	centre := make([]float64, len(parent.Position))
+	dimension := len(parent.Position)
+	centre := make([]float64, dimension)
 	delta := db.MAX_RANGE / float64(Exp2(depth))
 	for dim, value := range parent.Position {
-		// check each bits value for dimension comparison
+		// check each bits' value for dimension comparison
 		// must reverse due to lower dimension is at MSD (e.g. 0b101 -> xyz)
-		if ((quad >> (len(centre) - 1 - dim)) & 1) == 1 {
+		if ((quad >> (dimension - 1 - dim)) & 1) == 1 {
 			centre[dim] = value - delta // +ve bit -> less than parent's
 		} else {
 			centre[dim] = value + delta // +ve bit -> larger than parent's
@@ -109,6 +112,7 @@ func createSubDiv(parent data.Point, quad uint, depth int) data.QuadNode {
 		Centre: data.Point{
 			Position: centre,
 		},
+		Children: make([]*data.QuadNode, Exp2(dimension)),
 	}
 }
 
