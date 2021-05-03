@@ -9,6 +9,7 @@ import (
 
 	"github.com/daystram/quadsql/data"
 	"github.com/daystram/quadsql/db"
+	"github.com/daystram/quadsql/utils"
 )
 
 const (
@@ -54,36 +55,38 @@ func drawNode(s *svg.SVG, isPoint bool, node *data.QuadNode, bound [4]int, root 
 		hasChild := false
 		for quad, child := range node.Children {
 			hasChild = hasChild || child != nil
+			var bound [4]int
 			switch quad {
 			case 0: // NE
-				drawNode(s, isPoint, child, [4]int{
-					max(bound[0], y),
+				bound = [4]int{
+					utils.Max(bound[0], y),
 					bound[1],
 					bound[2],
-					max(bound[3], x),
-				}, false)
+					utils.Max(bound[3], x),
+				}
 			case 2: // NW
-				drawNode(s, isPoint, child, [4]int{
-					max(bound[0], y),
-					min(bound[1], x),
+				bound = [4]int{
+					utils.Max(bound[0], y),
+					utils.Min(bound[1], x),
 					bound[2],
 					bound[3],
-				}, false)
+				}
 			case 1: // SE
-				drawNode(s, isPoint, child, [4]int{
+				bound = [4]int{
 					bound[0],
 					bound[1],
-					min(bound[2], y),
-					max(bound[3], x),
-				}, false)
+					utils.Min(bound[2], y),
+					utils.Max(bound[3], x),
+				}
 			case 3: // SW
-				drawNode(s, isPoint, child, [4]int{
+				bound = [4]int{
 					bound[0],
-					min(bound[1], x),
-					min(bound[2], y),
+					utils.Min(bound[1], x),
+					utils.Min(bound[2], y),
 					bound[3],
-				}, false)
+				}
 			}
+			drawNode(s, isPoint, child, bound, false)
 		}
 		if hasChild {
 			s.Line(convX(x), convY(bound[0]), convX(x), convY(bound[2]), "fill:none;stroke:blue")
@@ -98,18 +101,4 @@ func convX(x int) int {
 
 func convY(y int) int {
 	return db.MAX_RANGE - y + SVG_PADDING
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }

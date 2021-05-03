@@ -6,6 +6,7 @@ import (
 
 	"github.com/daystram/quadsql/data"
 	"github.com/daystram/quadsql/db"
+	"github.com/daystram/quadsql/utils"
 )
 
 func (h *Handler) BuildIndex(isPoint bool) (err error) {
@@ -28,7 +29,7 @@ func (h *Handler) BuildIndex(isPoint bool) (err error) {
 					*node = &data.QuadNode{
 						Centre:   point,
 						PointID:  id,
-						Children: make([]*data.QuadNode, Exp2(h.database.Dimension)),
+						Children: make([]*data.QuadNode, utils.Exp2(h.database.Dimension)),
 					}
 					break
 				}
@@ -41,7 +42,7 @@ func (h *Handler) BuildIndex(isPoint bool) (err error) {
 			Centre: data.Point{
 				Position: []float64{db.MAX_RANGE / 2, db.MAX_RANGE / 2},
 			},
-			Children: make([]*data.QuadNode, Exp2(h.database.Dimension)),
+			Children: make([]*data.QuadNode, utils.Exp2(h.database.Dimension)),
 		}
 		for i, point := range h.database.Table {
 			id := new(int)
@@ -67,7 +68,7 @@ func (h *Handler) BuildIndex(isPoint bool) (err error) {
 					*node = &data.QuadNode{
 						Centre:   point,
 						PointID:  id,
-						Children: make([]*data.QuadNode, Exp2(h.database.Dimension)),
+						Children: make([]*data.QuadNode, utils.Exp2(h.database.Dimension)),
 					}
 					break
 				}
@@ -97,7 +98,7 @@ func createSubDiv(parent data.Point, quad uint, depth int) data.QuadNode {
 	*/
 	dimension := len(parent.Position)
 	centre := make([]float64, dimension)
-	delta := db.MAX_RANGE / float64(Exp2(depth))
+	delta := db.MAX_RANGE / float64(utils.Exp2(depth))
 	for dim, value := range parent.Position {
 		// check each bits' value for dimension comparison
 		// must reverse due to lower dimension is at MSD (e.g. 0b101 -> xyz)
@@ -112,7 +113,7 @@ func createSubDiv(parent data.Point, quad uint, depth int) data.QuadNode {
 		Centre: data.Point{
 			Position: centre,
 		},
-		Children: make([]*data.QuadNode, Exp2(dimension)),
+		Children: make([]*data.QuadNode, utils.Exp2(dimension)),
 	}
 }
 
@@ -129,27 +130,4 @@ func getQuadrant(center, point data.Point) (quad uint) {
 		}
 	}
 	return quad
-}
-
-func countNodes(node *data.QuadNode) (count, depth int) {
-	if node != nil {
-		for _, child := range node.Children {
-			c, d := countNodes(child)
-			count += c
-			if d > depth {
-				depth = d
-			}
-		}
-		count++
-		depth++
-	}
-	return
-}
-
-func Exp2(x int) int {
-	y := 1
-	for i := 0; i < x; i++ {
-		y *= 2
-	}
-	return y
 }

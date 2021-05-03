@@ -7,6 +7,7 @@ import (
 
 	"github.com/daystram/quadsql/data"
 	"github.com/daystram/quadsql/db"
+	"github.com/daystram/quadsql/utils"
 	"github.com/manifoldco/promptui"
 )
 
@@ -84,7 +85,7 @@ func (h *Handler) HandleCommand(command string) (err error) {
 			fmt.Println("Time report enabled")
 		}
 	case "/info":
-		count, depth := countNodes(h.index)
+		count, depth := utils.CountNodes(h.index)
 		fmt.Printf("Dimension       : %dD\n", h.database.Dimension)
 		fmt.Printf("DB Row Count    : %d\n", len(h.database.Table))
 		if h.config.IndexReady {
