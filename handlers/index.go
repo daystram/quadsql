@@ -2,35 +2,11 @@ package handlers
 
 import (
 	"fmt"
-	"math"
 	"time"
 
 	"github.com/daystram/quadsql/data"
 	"github.com/daystram/quadsql/db"
 )
-
-// h.index = &data.QuadNode{
-// 	Centre: data.Point{
-// 		Position: []float64{1, 2},
-// 	},
-// 	Children: []*data.QuadNode{{
-// 		Centre: data.Point{
-// 			Position: []float64{1, 2},
-// 		},
-// 	}, {
-// 		Centre: data.Point{
-// 			Position: []float64{1, 2},
-// 		},
-// 	}, {
-// 		Centre: data.Point{
-// 			Position: []float64{1, 2},
-// 		},
-// 	}, {
-// 		Centre: data.Point{
-// 			Position: []float64{1, 2},
-// 		},
-// 	}},
-// }
 
 func (h *Handler) BuildIndex(isPoint bool) (err error) {
 	start := time.Now()
@@ -52,6 +28,7 @@ func (h *Handler) BuildIndex(isPoint bool) (err error) {
 					*node = &data.QuadNode{
 						Centre:  point,
 						PointID: id,
+						// Children: make([]*data.QuadNode, Exp2(h.database.Dimension)),
 					}
 					break
 				}
@@ -60,53 +37,40 @@ func (h *Handler) BuildIndex(isPoint bool) (err error) {
 	} else {
 		// build Region index
 		fmt.Printf("Building Region index... ")
+		h.index = &data.QuadNode{
+			Centre: data.Point{
+				Position: []float64{db.MAX_RANGE / 2, db.MAX_RANGE / 2},
+			},
+		}
 		for i, point := range h.database.Table {
 			id := new(int)
 			*id = i
-			if h.index == nil {
-				depth := 1
-				h.index = &data.QuadNode{
-					Centre: data.Point{
-						Position: []float64{db.MAX_RANGE / math.Pow(2, float64(depth)), db.MAX_RANGE / math.Pow(2, float64(depth))},
-					},
-					Depth: depth,
-				}
-				quad := getQuadrant(h.index.Centre, point)
-				h.index.Children[quad] = &data.QuadNode{
-					Centre:  point,
-					PointID: id,
-				}
-			} else {
-				node := h.index
-				for {
-					if node.Depth > 10 {
-						break
-					}
-					quad := getQuadrant(node.Centre, point)
-					if child := node.Children[quad]; child != nil {
-						if child.PointID == nil {
-							node = child
-						} else {
-							// create new internal node (subdiv)
-							subdiv := createSubDiv(node.Centre, quad, node.Depth+1)
-							// reinsert this leaf node (child)
-							subdiv.Children[getQuadrant(subdiv.Centre, child.Centre)] = child
-							node.Children[quad] = &subdiv
-							// continue diving in
-							node = node.Children[quad]
-						}
+			node := &h.index
+			// track parent and depth for subdivision
+			parent, depth := h.index, 0
+			for {
+				if *node != nil {
+					if (*node).PointID == nil {
+						// continue diving in
+						depth++
+						parent = *node
+						node = &(*node).Children[getQuadrant((*node).Centre, point)]
 					} else {
-						// insert new leaf node
-						node.Children[quad] = &data.QuadNode{
-							Centre:  point,
-							PointID: id,
-						}
-						break
+						// collision with leaf node: create subdivision and reinsert leaf node
+						subdiv := createSubDiv(parent.Centre, getQuadrant(parent.Centre, point), depth+1)
+						subdiv.Children[getQuadrant(subdiv.Centre, (*node).Centre)] = *node
+						*node = &subdiv
 					}
+				} else {
+					// insert new leaf node
+					*node = &data.QuadNode{
+						Centre:  point,
+						PointID: id,
+					}
+					break
 				}
 			}
 		}
-
 	}
 
 	lastExecTime := float64(time.Since(start).Nanoseconds())
@@ -130,7 +94,7 @@ func createSubDiv(parent data.Point, quad uint, depth int) data.QuadNode {
 		 -- | +-
 	*/
 	centre := make([]float64, len(parent.Position))
-	delta := db.MAX_RANGE / math.Pow(2, float64(depth))
+	delta := db.MAX_RANGE / float64(Exp2(depth))
 	for dim, value := range parent.Position {
 		// check each bits value for dimension comparison
 		// must reverse due to lower dimension is at MSD (e.g. 0b101 -> xyz)
@@ -145,7 +109,6 @@ func createSubDiv(parent data.Point, quad uint, depth int) data.QuadNode {
 		Centre: data.Point{
 			Position: centre,
 		},
-		Depth: depth,
 	}
 }
 
@@ -177,4 +140,12 @@ func countNodes(node *data.QuadNode) (count, depth int) {
 		depth++
 	}
 	return
+}
+
+func Exp2(x int) int {
+	y := 1
+	for i := 0; i < x; i++ {
+		y *= 2
+	}
+	return y
 }
