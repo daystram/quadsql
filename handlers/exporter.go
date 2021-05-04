@@ -22,7 +22,7 @@ func (h *Handler) DrawSVG(scale float64, filename string) {
 	defer file.Close()
 	writer := bufio.NewWriter(file)
 	s := svg.New(writer)
-	s.Start(db.MAX_RANGE+2*SVG_PADDING, db.MAX_RANGE+2*SVG_PADDING)
+	s.Start(int((db.MAX_RANGE+2*SVG_PADDING)*scale), int((db.MAX_RANGE+2*SVG_PADDING)*scale))
 	s.Scale(scale)
 	s.Rect(0, 0, db.MAX_RANGE+2*SVG_PADDING, db.MAX_RANGE+2*SVG_PADDING, "fill:white;stroke:none")
 	s.Rect(SVG_PADDING, SVG_PADDING, db.MAX_RANGE, db.MAX_RANGE, "fill:none;stroke:black;stroke-width:2")
