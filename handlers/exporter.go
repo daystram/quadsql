@@ -55,38 +55,38 @@ func drawNode(s *svg.SVG, isPoint bool, node *data.QuadNode, bound [4]int, root 
 		hasChild := false
 		for quad, child := range node.Children {
 			hasChild = hasChild || child != nil
-			var bound [4]int
+			var cBound [4]int
 			switch quad {
 			case 0: // NE
-				bound = [4]int{
+				cBound = [4]int{
 					utils.Max(bound[0], y),
 					bound[1],
 					bound[2],
 					utils.Max(bound[3], x),
 				}
 			case 2: // NW
-				bound = [4]int{
+				cBound = [4]int{
 					utils.Max(bound[0], y),
 					utils.Min(bound[1], x),
 					bound[2],
 					bound[3],
 				}
 			case 1: // SE
-				bound = [4]int{
+				cBound = [4]int{
 					bound[0],
 					bound[1],
 					utils.Min(bound[2], y),
 					utils.Max(bound[3], x),
 				}
 			case 3: // SW
-				bound = [4]int{
+				cBound = [4]int{
 					bound[0],
 					utils.Min(bound[1], x),
 					utils.Min(bound[2], y),
 					bound[3],
 				}
 			}
-			drawNode(s, isPoint, child, bound, false)
+			drawNode(s, isPoint, child, cBound, false)
 		}
 		if hasChild {
 			s.Line(convX(x), convY(bound[0]), convX(x), convY(bound[2]), "fill:none;stroke:blue")
