@@ -33,7 +33,7 @@ func Generate(source string, genSeed int64, dimension, size int, max float64, di
 		case "line-strict":
 			position = line(randomizer, dimension, max, 0)
 		case "exp":
-			position = exponential(randomizer, dimension, max, 2/max)
+			position = exponential(randomizer, dimension, max, 4/max)
 		default:
 			return fmt.Errorf("unsupported. supported distributions: uniform, normal, line, line-strict, exp")
 		}
