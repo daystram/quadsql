@@ -4,6 +4,7 @@
      xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink">
 <g transform="scale(1)">
+<rect x="0" y="0" width="1056" height="1056" style="fill:white;stroke:none" />
 <rect x="16" y="16" width="1024" height="1024" style="fill:none;stroke:black;stroke-width:2" />
 <text x="16" y="1050" style="font-family:monospace;font-size:8" >(0,0)</text>
 <text x="1040" y="1050" style="font-family:monospace;font-size:8;text-anchor:end" >500 points @ Point Quad-tree</text>
