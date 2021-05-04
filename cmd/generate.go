@@ -14,16 +14,17 @@ var (
 )
 
 var generateCmd = &cobra.Command{
-	Use:   "generate [dimension] [size] [sorted]",
+	Use:   "generate [dimension] [size] [distribution] [sorted]",
 	Short: "Dataset generator",
 	Long:  `Generates n-dimensional spatial dataset.`,
-	Args:  cobra.ExactArgs(3),
+	Args:  cobra.ExactArgs(4),
 	Run: func(cmd *cobra.Command, args []string) {
 		dimension, _ := strconv.Atoi(args[0])
 		size, _ := strconv.Atoi(args[1])
 		max := float64(db.MAX_RANGE)
-		sorted, _ := strconv.ParseBool(args[2])
-		handlers.Generate(DBFile, genSeed, dimension, size, max, sorted)
+		distribution := args[2]
+		sorted, _ := strconv.ParseBool(args[3])
+		handlers.Generate(DBFile, genSeed, dimension, size, max, distribution, sorted)
 	},
 }
 
