@@ -5,6 +5,9 @@ quadsql
 *.db
 !sample.data.db
 
+datasets/
+svg/
+
 ### Go ###
 # Binaries for programs and plugins
 *.exe
