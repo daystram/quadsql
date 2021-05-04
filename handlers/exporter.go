@@ -24,6 +24,7 @@ func (h *Handler) DrawSVG(scale float64, filename string) {
 	s := svg.New(writer)
 	s.Start(db.MAX_RANGE+2*SVG_PADDING, db.MAX_RANGE+2*SVG_PADDING)
 	s.Scale(scale)
+	s.Rect(0, 0, db.MAX_RANGE+2*SVG_PADDING, db.MAX_RANGE+2*SVG_PADDING, "fill:white;stroke:none")
 	s.Rect(SVG_PADDING, SVG_PADDING, db.MAX_RANGE, db.MAX_RANGE, "fill:none;stroke:black;stroke-width:2")
 	s.Text(convX(0), convY(-10), "(0,0)", "font-family:monospace;font-size:8")
 	info := fmt.Sprintf("%d points", len(h.database.Table))
@@ -33,7 +34,6 @@ func (h *Handler) DrawSVG(scale float64, filename string) {
 		info += " @ Region Quad-tree"
 	}
 	s.Text(convX(db.MAX_RANGE), convY(-10), info, "font-family:monospace;font-size:8;text-anchor:end")
-
 	drawNode(s, h.config.IsPointQuad, h.index, [4]int{0, db.MAX_RANGE, db.MAX_RANGE, 0}, true) // bound: S, E, N, W
 	s.Gend()
 	s.End()
