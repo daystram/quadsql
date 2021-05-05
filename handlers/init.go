@@ -11,18 +11,11 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-type QueryConfig struct {
-	ShowTime    bool
-	UseIndex    bool
-	IndexReady  bool
-	IsPointQuad bool // true: Point; false: Region
-}
-
 type Handler struct {
-	database     *db.DB
-	config       *QueryConfig
-	index        *data.QuadNode
-	lastExecTime float64
+	database  *db.DB
+	config    *QueryConfig
+	index     *data.QuadNode
+	statistic Stat
 }
 
 func InitHandlers(database *db.DB, config *QueryConfig) Handler {
@@ -76,13 +69,13 @@ func (h *Handler) HandleCommand(command string) (err error) {
 		default:
 			fmt.Println("E: invalid action, see /help")
 		}
-	case "/time":
-		if h.config.ShowTime {
-			h.config.ShowTime = false
-			fmt.Println("Time report disabled")
+	case "/stat":
+		if h.config.ShowStat {
+			h.config.ShowStat = false
+			fmt.Println("Statistics report disabled")
 		} else {
-			h.config.ShowTime = true
-			fmt.Println("Time report enabled")
+			h.config.ShowStat = true
+			fmt.Println("Statistics report enabled")
 		}
 	case "/info":
 		count, depth := utils.CountNodes(h.index)
@@ -97,11 +90,10 @@ func (h *Handler) HandleCommand(command string) (err error) {
 		}
 		fmt.Printf("Index Nodes     : %d nodes\n", count)
 		fmt.Printf("Index Max Depth : %d\n", depth)
-		fmt.Printf("Last Exec Time  : %.3f µs (%.3f ms)\n", h.lastExecTime/1e3, h.lastExecTime/1e6)
 	case "/help", "/?":
 		fmt.Println("/info        : display DB and index statistics")
 		fmt.Println("/index [cmd] : switch index [on], [off], or [rebuild [point|region]]")
-		fmt.Println("/time        : toggle execution time report")
+		fmt.Println("/stat        : toggle statistics report")
 		fmt.Println("/svg [s] [f] : draw SVG of the Quad-tree with scale [s] into file [f].svg")
 		fmt.Println("/help        : show this help page")
 		fmt.Println("/exit        : exit quadsql")
@@ -109,8 +101,11 @@ func (h *Handler) HandleCommand(command string) (err error) {
 		break
 	default:
 		err = h.performQuery(command)
-		if h.config.ShowTime {
-			fmt.Printf("Exec time: %.3f µs (%.3f ms)\n", h.lastExecTime/1e3, h.lastExecTime/1e6)
+		if h.config.ShowStat {
+			fmt.Printf("Exec time    : %.3f µs (%.3f ms)\n", h.statistic.TimeExec/1e3, h.statistic.TimeExec/1e6)
+			fmt.Printf("Index access : %d\n", h.statistic.AccessIndex)
+			fmt.Printf("Table access : %d\n", h.statistic.AccessTable)
+			fmt.Printf("Point comp.  : %d\n", h.statistic.ComparePoint)
 		}
 		if err == ErrInvalidQuery {
 			err = nil

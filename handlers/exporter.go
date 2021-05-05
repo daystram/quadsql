@@ -89,8 +89,8 @@ func drawNode(s *svg.SVG, isPoint bool, node *data.QuadNode, bound [4]int, root 
 			drawNode(s, isPoint, child, cBound, false)
 		}
 		if hasChild {
-			s.Line(convX(x), convY(bound[0]), convX(x), convY(bound[2]), "fill:none;stroke:blue")
-			s.Line(convX(bound[1]), convY(y), convX(bound[3]), convY(y), "fill:none;stroke:blue")
+			s.Line(convX(x), convY(bound[0]), convX(x), convY(bound[2]), "fill:none;stroke:blue;stroke-width:1;opacity:0.75")
+			s.Line(convX(bound[1]), convY(y), convX(bound[3]), convY(y), "fill:none;stroke:blue;stroke-width:1;opacity:0.75")
 		}
 	}
 }

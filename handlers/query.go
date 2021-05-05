@@ -59,12 +59,10 @@ func (h *Handler) performQuery(query string) (err error) {
 	}
 	fmt.Printf("QUERY: %+v \n", queryModel)
 
-	start := time.Now()
 	var result QueryResult
 	if result, err = h.execute(queryModel); err != nil {
 		return
 	}
-	h.statistic.TimeExec = float64(time.Since(start).Nanoseconds())
 
 	fmt.Println("\n  id\t position")
 	fmt.Println("----------------------------")
@@ -77,14 +75,16 @@ func (h *Handler) performQuery(query string) (err error) {
 }
 
 func (h *Handler) execute(query QueryModel) (result QueryResult, err error) {
+	start := time.Now()
+	accessIndex, accessTable, comparePoint := 0, 0, 0
 	switch query.Type {
 	case "SELECT":
 		if query.Condition.Field == "" {
 			for id, point := range h.database.Table {
+				accessTable++
 				result = append(result, Row{id, point})
 			}
 		} else {
-			accessIndex, accessTable, comparePoint := 0, 0, 0
 			switch query.Condition.Field {
 			case "id":
 				// direct table access
@@ -136,9 +136,12 @@ func (h *Handler) execute(query QueryModel) (result QueryResult, err error) {
 					}
 				}
 			}
-			fmt.Printf("Index accesses  : %d\n", accessIndex)
-			fmt.Printf("Table accesses  : %d\n", accessTable)
-			fmt.Printf("Point comparison: %d\n", comparePoint)
+		}
+		h.statistic = Stat{
+			TimeExec:     float64(time.Since(start).Nanoseconds()),
+			AccessIndex:  accessIndex,
+			AccessTable:  accessTable,
+			ComparePoint: comparePoint,
 		}
 	default:
 		err = ErrInvalidQuery
