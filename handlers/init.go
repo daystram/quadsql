@@ -15,7 +15,7 @@ type Handler struct {
 	database  *db.DB
 	config    *QueryConfig
 	index     *data.QuadNode
-	statistic Stat
+	Statistic Stat
 }
 
 func InitHandlers(database *db.DB, config *QueryConfig) Handler {
@@ -102,10 +102,10 @@ func (h *Handler) HandleCommand(command string) (err error) {
 	default:
 		err = h.performQuery(command)
 		if h.config.ShowStat {
-			fmt.Printf("Exec time    : %.3f µs (%.3f ms)\n", h.statistic.TimeExec/1e3, h.statistic.TimeExec/1e6)
-			fmt.Printf("Index access : %d\n", h.statistic.AccessIndex)
-			fmt.Printf("Table access : %d\n", h.statistic.AccessTable)
-			fmt.Printf("Point comp.  : %d\n", h.statistic.ComparePoint)
+			fmt.Printf("Exec time    : %.3f µs (%.3f ms)\n", h.Statistic.TimeExec/1e3, h.Statistic.TimeExec/1e6)
+			fmt.Printf("Index access : %d\n", h.Statistic.AccessIndex)
+			fmt.Printf("Table access : %d\n", h.Statistic.AccessTable)
+			fmt.Printf("Point comp.  : %d\n", h.Statistic.ComparePoint)
 		}
 		if err == ErrInvalidQuery {
 			err = nil

@@ -69,7 +69,7 @@ func (h *Handler) performQuery(query string) (err error) {
 	}
 
 	var result QueryResult
-	if result, err = h.execute(queryModel); err != nil {
+	if result, err = h.Execute(queryModel); err != nil {
 		return
 	}
 
@@ -83,7 +83,7 @@ func (h *Handler) performQuery(query string) (err error) {
 	return
 }
 
-func (h *Handler) execute(query QueryModel) (result QueryResult, err error) {
+func (h *Handler) Execute(query QueryModel) (result QueryResult, err error) {
 	start := time.Now()
 	accessIndex, accessTable, comparePoint := 0, 0, 0
 	switch query.Type {
@@ -146,7 +146,7 @@ func (h *Handler) execute(query QueryModel) (result QueryResult, err error) {
 				}
 			}
 		}
-		h.statistic = Stat{
+		h.Statistic = Stat{
 			TimeExec:     float64(time.Since(start).Nanoseconds()),
 			AccessIndex:  accessIndex,
 			AccessTable:  accessTable,

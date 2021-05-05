@@ -76,8 +76,8 @@ func (h *Handler) BuildIndex(isPoint bool) (err error) {
 		}
 	}
 
-	lastExecTime := float64(time.Since(start).Nanoseconds())
-	fmt.Printf("Done in %.3f µs (%.3f ms)\n", lastExecTime/1e3, lastExecTime/1e6)
+	h.Statistic.TimeIndexBuild = float64(time.Since(start).Nanoseconds())
+	fmt.Printf("Done in %.3f µs (%.3f ms)\n", h.Statistic.TimeIndexBuild/1e3, h.Statistic.TimeIndexBuild/1e6)
 	h.config.IndexReady = true
 	return
 }
