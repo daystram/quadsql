@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/daystram/quadsql/data"
@@ -10,10 +12,7 @@ import (
 /*
 	Example queries:
 		SELECT *
-		SELECT * WHERE position = Point(1,2)
-		// DELETE WHERE id = 4
-		// DELETE WHERE position = Point(1,2)
-		// INSERT Point(5,6)
+		SELECT * WHERE position=Point(1,2)
 */
 
 type QueryConfig struct {
@@ -42,29 +41,39 @@ type Row struct {
 
 func (h *Handler) performQuery(query string) (err error) {
 
-	// TODO: query parser
-
-	// queryModel := QueryModel{
-	// 	Type:      "SELECT",
-	// 	Condition: Condition{},
-	// }
-	queryModel := QueryModel{
-		Type: "SELECT",
-		Condition: Condition{
+	// query parser
+	queryModel := QueryModel{Type: "SELECT"}
+	condition := strings.TrimPrefix(strings.TrimPrefix(strings.ToLower(query), "select *"), " where ")
+	switch args := strings.Split(condition, "="); args[0] {
+	case "id":
+		var id int
+		if id, err = strconv.Atoi(args[1]); err != nil {
+			return ErrInvalidQuery
+		}
+		queryModel.Condition = Condition{
+			Field: "id",
+			Value: id,
+		}
+	case "position":
+		var position data.Point
+		if position, err = data.ParsePoint(args[1]); err != nil {
+			return ErrInvalidQuery
+		}
+		queryModel.Condition = Condition{
 			Field: "position",
-			Value: data.Point{
-				Position: []float64{220.15633674827117, 634.219107312793},
-			},
-		},
+			Value: position,
+		}
+	case "":
+	default:
+		return ErrInvalidQuery
 	}
-	fmt.Printf("QUERY: %+v \n", queryModel)
 
 	var result QueryResult
 	if result, err = h.execute(queryModel); err != nil {
 		return
 	}
 
-	fmt.Println("\n  id\t position")
+	fmt.Println("\n    id\t position")
 	fmt.Println("----------------------------")
 	for _, row := range result {
 		fmt.Printf("  %d\t %s\n", row.ID, row.Position)
