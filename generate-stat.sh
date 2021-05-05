@@ -16,12 +16,12 @@ MODE=point,region,none
 for DIST in ${DISTS[@]}; do
     for SORTED_P in ${SORTED_PS[@]}; do
         IFS="," read SORTED SORTED_F <<< "$SORTED_P"
-        CSV="csv/$DIST-$SORTED.csv"
+        CSV="stat/$DIST-$SORTED.csv"
         echo "dim,row,index_type,node_count,max_depth,build_time,avg_exec_time,avg_index_access,avg_table_access,avg_point_comp,runs" > $CSV
         for SIZE in ${SIZES[@]}; do
             for DIM in ${DIMS[@]}; do
-                DB="csv/datasets/$DIST-$SORTED.db"
-                echo "---------  $DIST, $SIZE points @ ${DIM}D, $SORTED"
+                DB="stat/datasets/$DIST-$SORTED.db"
+                echo "---------  $DIST $SORTED, $SIZE points @ ${DIM}D"
                 ./quadsql --db $DB generate $DIM $SIZE $DIST $SORTED_F --seed $SEED > /dev/null 2> /dev/null
                 ./quadsql --db $DB statistic --mode $MODE --runs $RUNS --no-head > /dev/null 2>> $CSV
             done
