@@ -2,15 +2,14 @@
 
 SEED=7
 SIZE=500
-SCALE=0.75
+SCALE=1
 
-mkdir -p datasets
-mkdir -p svg
+mkdir -p svg/datasets
 
 for DISTRIBUTION in "uniform" "normal" "line" "line-strict" "exp"; do
     for SORTED_P in "sorted,true" "random,false"; do
         IFS="," read SORTED SORTED_F <<< "$SORTED_P"
-        DB="datasets/$DISTRIBUTION-$SORTED.db"
+        DB="svg/datasets/$DISTRIBUTION-$SORTED.db"
         echo $DB
         ./quadsql --db $DB generate 2 $SIZE $DISTRIBUTION $SORTED_F --seed $SEED > /dev/null 2> /dev/null
         echo "/svg $SCALE $DISTRIBUTION-$SORTED-point" | ./quadsql --db $DB > /dev/null 2> /dev/null

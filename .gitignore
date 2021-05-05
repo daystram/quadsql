@@ -5,8 +5,10 @@ quadsql
 *.db
 !sample.data.db
 
-datasets/
 svg/
+stat/
+
+.vscode/
 
 ### Go ###
 # Binaries for programs and plugins
@@ -140,7 +142,8 @@ modules.xml
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
