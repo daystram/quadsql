@@ -56,13 +56,16 @@ var statisticCmd = &cobra.Command{
 func sampleStats(db db.DB, h handlers.Handler) (stat []handlers.Stat) {
 	for i := int64(0); i < statRuns; i++ {
 		for _, point := range db.Table {
-			h.Execute(handlers.QueryModel{
+			res, err := h.Execute(handlers.QueryModel{
 				Type: "SELECT",
 				Condition: handlers.Condition{
 					Field: "position",
 					Value: point,
 				},
 			})
+			if len(res) == 0 || res[0].Position.CompareTo(point) != 0 || err != nil {
+				panic("E: query error")
+			}
 			stat = append(stat, h.Statistic)
 		}
 	}
