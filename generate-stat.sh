@@ -5,26 +5,48 @@ mkdir -p stat/datasets
 
 SEED=7
 
-DISTS=(normal line-strict)
+# 1
+EXP=1
+DISTS=(uniform line-strict normal)
 SORTED_PS=(random,false sorted,true)
-# SIZES=(10 50 100 250 500 1000 1500 2000 2500 3000 5000 10000 25000 50000 75000 100000 125000 150000 175000 200000)
-# SIZES=(5 10 50 100 250 500 750 1000 1500 2000 2500 3000 3500 4000 4500 5000 7500 10000 12500 15000 17500 20000 22500 25000 27500 30000 32500 35000 37500 40000 42500 45000 47500 50000)
-SIZES=(5 10 50 100 250 500 750 1000 1500 2000 2500 3000 3500 4000 4500 5000 7500 10000 15000 20000 25000 30000 35000 40000 45000 50000)
+SIZES=(100 250 500 750 1000 2500 5000 7500 10000 20000 40000 60000 80000 100000)
 DIMS=(2)
 
-RUNS=4
+# 2
+# EXP=2
+# DISTS=(uniform)
+# SORTED_PS=(random,false)
+# SIZES=(100 250 500 750 1000 2500 5000 7500 10000 20000 40000 60000 80000 100000)
+# DIMS=(2 3 4 10 15 20)
+
+# 3
+# EXP=3
+# DISTS=(uniform)
+# SORTED_PS=(random,false)
+# SIZES=(10 50 100 250 500 750 1000 2500 5000 7500 10000 20000 40000 60000 80000 100000 200000 400000 600000 800000 1000000 2000000 4000000 6000000 8000000 10000000)
+# DIMS=(2)
+
+# 4
+# EXP=4
+# DISTS=(uniform)
+# SORTED_PS=(random,false)
+# SIZES=(100 250 500 750 1000 2500 5000 7500 10000 20000 40000 60000 80000 100000)
+# DIMS=(2)
+
+RUNS=5
 MODE=point,region,none
 
 TOTAL=$((${#DISTS[@]}*${#SORTED_PS[@]}*${#SIZES[@]}*${#DIMS[@]}))
 STEP=0
 
+mkdir -p "stat/$EXP"
 for DIST in ${DISTS[@]}; do
     for SORTED_P in ${SORTED_PS[@]}; do
         IFS="," read SORTED SORTED_F <<< "$SORTED_P"
-        CSV="stat/$DIST-$SORTED.csv"
+        CSV="stat/$EXP/$DIST-$SORTED.csv"
         echo "dim,row,index_type,node_count,max_depth,build_time,avg_exec_time,avg_index_access,avg_table_access,avg_point_comp,runs" > $CSV
-        for SIZE in ${SIZES[@]}; do
-            for DIM in ${DIMS[@]}; do
+        for DIM in ${DIMS[@]}; do
+            for SIZE in ${SIZES[@]}; do
                 ((STEP++))
                 DB="stat/datasets/$DIST-$SORTED.db"
                 echo "----------------------------- [$STEP/$TOTAL] $DIST $SORTED, $SIZE points @ ${DIM}D"
