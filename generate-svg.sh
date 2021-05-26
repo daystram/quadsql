@@ -1,12 +1,12 @@
 #!/bin/bash
 
 SEED=7
-SIZE=500
+SIZE=250
 SCALE=1
 
 mkdir -p svg/datasets
 
-for DISTRIBUTION in "uniform" "normal" "line" "line-strict" "exp"; do
+for DISTRIBUTION in "uniform" "normal" "line-strict"; do
     for SORTED_P in "sorted,true" "random,false"; do
         IFS="," read SORTED SORTED_F <<< "$SORTED_P"
         DB="svg/datasets/$DISTRIBUTION-$SORTED.db"
