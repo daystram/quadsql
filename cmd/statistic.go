@@ -2,11 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 
+	"github.com/daystram/quadsql/data"
 	"github.com/daystram/quadsql/db"
 	"github.com/daystram/quadsql/handlers"
 )
@@ -54,8 +56,16 @@ var statisticCmd = &cobra.Command{
 }
 
 func sampleStats(db db.DB, h handlers.Handler) (stat []handlers.Stat) {
+	sampler := make([]data.Point, len(db.Table))
+	for i, point := range db.Table {
+		sampler[i] = point
+	}
+	rand.Seed(statRuns)
 	for i := int64(0); i < statRuns; i++ {
-		for _, point := range db.Table {
+		rand.Shuffle(len(sampler), func(i, j int) {
+			sampler[i], sampler[j] = sampler[j], sampler[i]
+		})
+		for _, point := range sampler {
 			res, err := h.Execute(handlers.QueryModel{
 				Type: "SELECT",
 				Condition: handlers.Condition{
