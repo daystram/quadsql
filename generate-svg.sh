@@ -18,3 +18,4 @@ for DISTRIBUTION in "uniform" "normal" "line-strict"; do
 done
 
 mv *.svg svg/
+rm -rf svg/datasets

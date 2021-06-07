@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-mkdir -p stat/datasets
+mkdir -p stat2
 
 SEED=7
 RUNS=10
@@ -9,16 +9,16 @@ RUNS=10
 run() {
     TOTAL=$((${#DISTS[@]}*${#SORTED_PS[@]}*${#SIZES[@]}*${#DIMS[@]}))
     STEP=0
-    mkdir -p "stat/$EXP"
+    mkdir -p "stat2/experiment-$EXP/datasets"
     for DIST in ${DISTS[@]}; do
         for SORTED_P in ${SORTED_PS[@]}; do
             IFS="," read SORTED SORTED_F <<< "$SORTED_P"
-            CSV="stat/$EXP/$DIST-$SORTED.csv"
+            CSV="stat2/experiment-$EXP/$DIST-$SORTED.csv"
             echo "dim,row,index_type,node_count,max_depth,build_time,avg_exec_time,avg_index_access,avg_table_access,avg_point_comp,runs" > $CSV
             for DIM in ${DIMS[@]}; do
                 for SIZE in ${SIZES[@]}; do
                     ((STEP++))
-                    DB="stat/datasets/$DIST-$SORTED.db"
+                    DB="stat2/experiment-$EXP/datasets/$DIST-$SORTED.db"
                     echo "[Exp: $EXP] ----------------------------- [$STEP/$TOTAL] $DIST $SORTED, $SIZE points @ ${DIM}D"
                     ./quadsql --db $DB generate $DIM $SIZE $DIST $SORTED_F --seed $SEED > /dev/null 2> /dev/null
                     ./quadsql --db $DB statistic --mode $MODE --runs $RUNS --no-head 2>> $CSV
